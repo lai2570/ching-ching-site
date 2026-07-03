@@ -1,4 +1,4 @@
-# Ching Ching — Site
+# Chin Chin — Site
 
 Static site, no build step. Open `index.html` directly in a browser to preview locally,
 or run a local server:
