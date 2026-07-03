@@ -254,6 +254,19 @@ h1 {
   text-align: center;
 }
 
+/* Form embed with a real Google Form loaded */
+.form-embed.has-form {
+  border-style: solid;
+  padding: 0;
+  overflow: hidden;
+}
+
+.form-embed.has-form iframe {
+  display: block;
+  width: 100%;
+  border: none;
+}
+
 /* Contact links */
 .contact-links {
   list-style: none;
