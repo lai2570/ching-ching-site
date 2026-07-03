@@ -105,8 +105,9 @@ body {
 
 .about-gallery img {
   flex: 1;
-  height: 220px;
+  height: 380px;
   object-fit: cover;
+  object-position: top;
   border-radius: var(--radius);
 }
 
@@ -116,7 +117,7 @@ body {
   }
 
   .about-gallery img {
-    height: 260px;
+    height: 340px;
   }
 }
 
