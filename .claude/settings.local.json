@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(gh auth *)",
+      "Bash(git --version)",
+      "WebFetch(domain:law.moj.gov.tw)",
+      "WebFetch(domain:edu.law.moe.gov.tw)"
+    ]
+  }
+}
