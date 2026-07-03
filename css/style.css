@@ -114,7 +114,9 @@ body {
 
 .about-gallery img {
   flex: 1;
-  height: 380px;
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: 3 / 4;
   object-fit: cover;
   object-position: top;
   border-radius: var(--radius);
@@ -122,11 +124,7 @@ body {
 
 @media (max-width: 720px) {
   .about-gallery {
-    flex-direction: column;
-  }
-
-  .about-gallery img {
-    height: 340px;
+    gap: 8px;
   }
 }
 
