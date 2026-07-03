@@ -91,8 +91,33 @@ body {
 
 .hero-photo {
   flex: 0 0 260px;
+  width: 260px;
   height: 260px;
   border-radius: 50%;
+  object-fit: cover;
+}
+
+.about-gallery {
+  display: flex;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.about-gallery img {
+  flex: 1;
+  height: 220px;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+@media (max-width: 720px) {
+  .about-gallery {
+    flex-direction: column;
+  }
+
+  .about-gallery img {
+    height: 260px;
+  }
 }
 
 .hero-text { flex: 1; min-width: 0; }
