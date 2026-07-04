@@ -17,7 +17,7 @@ npx serve .
       above the placeholder) and paste its `<iframe>` embed code in, replacing the
       `[Google Form embed goes here]` placeholder
 - [ ] Create the Chinese Tutoring Google Form the same way
-- [ ] Replace `REPLACE_WITH_EMAIL@example.com` with a real contact email (appears twice)
+- [x] Replace `REPLACE_WITH_EMAIL@example.com` with a real contact email (appears twice)
 - [ ] Replace Instagram / Facebook `REPLACE_ME` links with real profile URLs
 
 ## Deploying to GitHub Pages (private source, public site)
