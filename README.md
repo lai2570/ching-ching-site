@@ -28,6 +28,22 @@ The page text is in English in the HTML, and `js/i18n.js` swaps it to 中文 or 
 - The Google Forms are not translated by the site; they show whatever language the form
   itself is written in.
 
+### Editing text from Google Sheets
+
+If `SHEET_CSV_URL` at the top of `js/i18n.js` is set, the site loads that published Google
+Sheet on every visit and uses its text instead of the built-in text. Chin Chin edits the
+sheet; no code change or deploy is needed. Google refreshes the published copy within
+about 5 minutes.
+
+- Sheet columns: `位置（說明）` (just a note), `key`, `en`, `zh`, `my`. **Don't change the
+  `key` column** — it's how the site knows where each text goes.
+- An empty cell keeps the built-in text for that spot.
+- The sheet only changes what visitors see after the page loads. Search engines and
+  link previews still read the English written in the HTML, so for big rewrites of the
+  English, update `index.html` / `about.html` too.
+- Adding a brand-new piece of text (not just changing existing text) still needs a code
+  change: a `data-i18n` key in the HTML, plus a row in the sheet.
+
 ## Images
 
 Photos are resized to ~900px wide before committing (phone photos straight from the camera

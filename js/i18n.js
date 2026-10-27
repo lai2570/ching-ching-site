@@ -1,6 +1,12 @@
 // Translations. English is also written directly in the HTML, so the page still
 // reads correctly if this script fails. Elements opt in with data-i18n (text),
 // data-i18n-alt (image alt) or data-i18n-content (meta description).
+
+// Published Google Sheet (CSV) that overrides the text below, so Chin Chin can
+// edit the site without touching code. Columns: key, en, zh, my (any others are
+// ignored). Empty cells, or the sheet being unreachable, fall back to the text
+// below. Leave as "" to turn the sheet off.
+const SHEET_CSV_URL = "";
 const translations = {
   en: {
     "meta.indexTitle": "Chin Chin | Myanmar-Taiwan Bridge",
@@ -30,6 +36,7 @@ const translations = {
     "footer.rights": "All rights reserved.",
     "about.eyebrow": "About",
     "about.lead": "I came to Taiwan from Myanmar, completed the 僑生先修部 (overseas student prep program), and graduated from National Taiwan University's Department of Accounting — Taiwan's top-ranked university. Along the way I built a following across Myanmar and Taiwan, and now I use it to help students and fans figure out the same path I once had to figure out myself: getting into a Taiwanese school, learning Chinese, and settling in.",
+    "stat.followersValue": "14K+",
     "stat.followers": "Followers",
     "stat.yearsValue": "8+ yrs",
     "stat.years": "In Taiwan",
@@ -69,6 +76,7 @@ const translations = {
     "footer.rights": "版權所有。",
     "about.eyebrow": "關於我",
     "about.lead": "我從緬甸來到台灣，讀完僑生先修部，之後從台灣排名第一的國立臺灣大學會計學系畢業。一路上，我在緬甸和台灣累積了一群粉絲，現在我用這個平台，幫助學生和粉絲走我當年自己摸索過的路：申請台灣的學校、學中文，以及在這裡安頓下來。",
+    "stat.followersValue": "14K+",
     "stat.followers": "追蹤者",
     "stat.yearsValue": "8+ 年",
     "stat.years": "在台灣",
@@ -109,6 +117,7 @@ const translations = {
     "footer.rights": "မူပိုင်ခွင့် အားလုံး ရယူထားသည်။",
     "about.eyebrow": "ကျွန်မအကြောင်း",
     "about.lead": "ကျွန်မက မြန်မာနိုင်ငံကနေ ထိုင်ဝမ်ကို လာရောက်ခဲ့ပြီး 僑生先修部 (နိုင်ငံခြားသားကျောင်းသားများအတွက် တက္ကသိုလ်အကြိုပြင်ဆင်ရေးသင်တန်း) ကို တက်ရောက်ခဲ့ပါတယ်။ အဲဒီနောက်မှာတော့ ထိုင်ဝမ်ရဲ့ အကောင်းဆုံးတက္ကသိုလ်ဖြစ်တဲ့ National Taiwan University (NTU) ရဲ့ စာရင်းကိုင်မေဂျာနဲ့ ဘွဲ့ရခဲ့ပါတယ်။ ဒီခရီးလမ်းတစ်လျှောက်မှာ မြန်မာနဲ့ ထိုင်ဝမ်က Followers တွေရဲ့ အားပေးမှုကို ရရှိခဲ့ပြီး၊ အခုချိန်မှာတော့ ကျွန်မကိုယ်တိုင် ကြုံတွေ့ဖြတ်သန်းခဲ့ရတဲ့ အတွေ့အကြုံတွေကနေတစ်ဆင့် ထိုင်ဝမ်မှာ ကျောင်းဝင်ခွင့်ရဖို့၊ တရုတ်စာလေ့လာဖို့နဲ့ ဒီမှာ အခြေချနေထိုင်ဖို့ စတဲ့ အကြောင်းအရာတွေကို ကျောင်းသားတွေနဲ့ Followers တွေအတွက် ပြန်လည်မျှဝေ ကူညီပေးနေပါတယ်။",
+    "stat.followersValue": "14K+",
     "stat.followers": "Followers",
     "stat.yearsValue": "၈+ နှစ်",
     "stat.years": "ထိုင်ဝမ်တွင်",
@@ -139,8 +148,66 @@ function pickInitialLang() {
   return "en";
 }
 
+// Minimal CSV parser: handles quoted fields with commas, quotes and newlines.
+function parseCsv(csv) {
+  const rows = [[]];
+  let field = "";
+  let quoted = false;
+  for (let i = 0; i < csv.length; i++) {
+    const c = csv[i];
+    if (quoted) {
+      if (c === '"' && csv[i + 1] === '"') {
+        field += '"';
+        i++;
+      } else if (c === '"') quoted = false;
+      else field += c;
+    } else if (c === '"') quoted = true;
+    else if (c === ",") {
+      rows[rows.length - 1].push(field);
+      field = "";
+    } else if (c === "\n") {
+      rows[rows.length - 1].push(field);
+      field = "";
+      rows.push([]);
+    } else if (c !== "\r") field += c;
+  }
+  rows[rows.length - 1].push(field);
+  return rows;
+}
+
+// Turns sheet rows into { en: { key: text }, zh: {...}, my: {...} }.
+function sheetToText(rows) {
+  const header = rows[0].map((h) => h.trim().toLowerCase());
+  const keyCol = header.indexOf("key");
+  const out = {};
+  if (keyCol < 0) return out;
+  for (const lang of Object.keys(translations)) {
+    const col = header.indexOf(lang);
+    if (col < 0) continue;
+    out[lang] = {};
+    for (const row of rows.slice(1)) {
+      const key = (row[keyCol] || "").trim();
+      const text = (row[col] || "").trim();
+      if (key && text) out[lang][key] = text;
+    }
+  }
+  return out;
+}
+
+// Last sheet text this browser saw, so edits show instantly on repeat visits
+// while the fresh copy loads.
+let sheetText = {};
+if (SHEET_CSV_URL) {
+  try {
+    sheetText = JSON.parse(localStorage.getItem("sheetText")) || {};
+  } catch (e) {}
+}
+
+let currentLang = "en";
+
 function setLang(lang) {
-  const dict = translations[lang];
+  currentLang = lang;
+  const dict = { ...translations[lang], ...sheetText[lang] };
   document.documentElement.lang = htmlLang[lang];
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     const text = dict[el.dataset.i18n];
@@ -167,3 +234,16 @@ document.querySelectorAll(".lang-switch button").forEach((btn) => {
 });
 
 setLang(pickInitialLang());
+
+if (SHEET_CSV_URL) {
+  fetch(SHEET_CSV_URL, { cache: "no-store" })
+    .then((res) => (res.ok ? res.text() : Promise.reject(res.status)))
+    .then((csv) => {
+      sheetText = sheetToText(parseCsv(csv));
+      try {
+        localStorage.setItem("sheetText", JSON.stringify(sheetText));
+      } catch (e) {}
+      setLang(currentLang);
+    })
+    .catch(() => {});
+}
