@@ -6,7 +6,8 @@
 // edit the site without touching code. Columns: key, en, zh, my (any others are
 // ignored). Empty cells, or the sheet being unreachable, fall back to the text
 // below. Leave as "" to turn the sheet off.
-const SHEET_CSV_URL = "";
+const SHEET_CSV_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vR9wojaRKCadNxKxNFtLOIn6wC7NyfmhHnNXLOLWb6A0pZem4IgB6iJsD5PHRDxMFOzxLMMJ2CQwM2P/pub?gid=0&single=true&output=csv";
 const translations = {
   en: {
     "meta.indexTitle": "Chin Chin | Myanmar-Taiwan Bridge",
